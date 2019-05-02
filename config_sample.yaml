@@ -1,0 +1,16 @@
+auth:
+  basic_auth: false
+  kerberos: true
+  username: <Username>
+board: <Board Name>
+ca_cert_path: <Cert Path>
+check_for_updates: 'false'
+email_id: <Email ID>
+git_urls:
+- https://github.com/SatelliteQE/robottelo
+- https://github.com/SatelliteQE/satellite6-upgrade
+github_username: <Github Username>
+label_check: false
+project: <Project Name>
+url: <Jira URL>
+verify_ssl: true
