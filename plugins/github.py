@@ -1,6 +1,6 @@
 import did.cli
 import did.base
-import utils
+from utils import utils
 
 
 # INTERVAL = "--since 2018-01-01 --until 2019-04-24"
@@ -101,23 +101,11 @@ class GitHubPlugin(object):
         # print_issue_list(pr_review_list)
         return pr_review_list
 
-# def get_single_comment(url):
-#     response = urllib.urlopen(url)
-#     data = json.loads(response.read())
-#     for comment in data:
-#         if comment['body'] == "omkarkhatavkar":
-#             print(comment['body'])
-#
-#
-# def get_pull_requests_review_comments():
-#     did.base.Config(CONFIG)
-#     option = "--gh-pull-requests-review-comments  --width 160 "
-#     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[6].stats
-#     for index, stat in enumerate(stats):
-#             print("\n")
-#             # print(stat.project + " #" + str(stat.data['number']))
-#             # print("Title ==> " + stat.title)
-#             # print("Status ==> " + stat.data['state'])
-#             # print("Comment URL ==> " + stat.data['comments_url'].encode())
-#             get_single_comment(stat.data['comments_url'].encode())
+    def get_pull_requests_review_in_progress(self):
+        did.base.Config(self.config)
+        option = "--gh-pull-requests-review-in-progress  --width 160 "
+        stats = did.cli.main(option + self.interval)[0][0].stats[0].stats[6].stats
+        pr_review_list = filter_issue_list(git_urls=self.git_urls, stats=stats)
+        # print_issue_list(pr_review_list)
+        return pr_review_list
 
