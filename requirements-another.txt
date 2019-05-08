@@ -1,2 +1,2 @@
--e git+https://github.com/omkarkhatavkar/jiraprompt.git@88b04b9b889a338f3727725cd101a11fa4e28ea1#egg=jiraprompt
--e git+https://github.com/omkarkhatavkar/did.git@a82785d45af5a516a1ad40984aa4537762722f99#egg=did
+git+https://github.com/omkarkhatavkar/jiraprompt.git@88b04b9b889a338f3727725cd101a11fa4e28ea1#egg=jiraprompt
+git+https://github.com/omkarkhatavkar/did.git@a82785d45af5a516a1ad40984aa4537762722f99#egg=did
