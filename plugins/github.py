@@ -12,9 +12,11 @@ email = <email_id>
 type = github
 url = https://api.github.com/
 login = <login_name>
+token = <token>
 """
 
 
+# below code is for debugging
 def print_issue_list(issue_list):
     utils.echo_error('\n=======================================Start Fetching=======================================')
     for issue_stat in issue_list:
@@ -38,9 +40,10 @@ def filter_issue_list(git_urls, stats):
 
 
 class GitHubPlugin(object):
-    def __init__(self, github_username, email, interval, git_urls):
+    def __init__(self, github_username, email, interval, git_urls, github_token):
         self.config = CONFIG.replace('<login_name>', str(github_username))
         self.config = self.config.replace('<email_id>', str(email))
+        self.config = self.config.replace('<token>', str(github_token))
         self.interval = interval
         self.git_urls = git_urls
 

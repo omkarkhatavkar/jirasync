@@ -82,6 +82,8 @@ def cli(debug):
               help="Pass the Jira url")
 @click.option('--github-username', default=None, prompt=True,
               help="Pass GitHub username")
+@click.option('--github-token', default=None, prompt=True,
+              help="Pass GitHub token")
 @click.option('--jira-username', default=None, prompt=True,
               help="Pass Jira username")
 @click.option('--jira-email-id', default=None, prompt=True,
@@ -91,14 +93,14 @@ def cli(debug):
 @click.option('--jira-project', prompt=True, confirmation_prompt=False,
               help='Pass the Jira project name')
 @pass_config
-def set_config(config, git_urls, jira_url, github_username, jira_username,
-               jira_email_id, jira_board, jira_project):
+def set_config(config, git_urls, jira_url, github_username, github_token,
+               jira_username, jira_email_id, jira_board, jira_project):
     """Set git_urls and github username"""
     if os.path.exists(config.config_file):
         os.unlink(config.config_file)
     try:
-        if None not in (git_urls, github_username, jira_username, jira_email_id,
-                        jira_board, jira_project, jira_url):
+        if None not in (git_urls, github_username, github_token, jira_username,
+                        jira_email_id, jira_board, jira_project, jira_url):
             auth_dict = {
                 'kerberos': True,
                 'basic_auth': False,
@@ -107,6 +109,7 @@ def set_config(config, git_urls, jira_url, github_username, jira_username,
             content_dict = {
                 'url': str(jira_url).encode(),
                 'github_username': str(github_username).encode(),
+                'github_token': str(github_token).encode(),
                 'board': str(jira_board).encode(),
                 'project': str(jira_project).encode(),
                 'email_id': str(jira_email_id).encode(),
@@ -144,7 +147,8 @@ def check_github_history(config, interval):
     git_hub_plugin = GitHubPlugin(yaml_data['github_username'],
                                   yaml_data['email_id'],
                                   interval,
-                                  yaml_data['git_urls']
+                                  yaml_data['git_urls'],
+                                  yaml_data['github_token']
                                   )
     issue_list = git_hub_plugin.get_github_issues_created_list()
     assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
@@ -154,8 +158,8 @@ def check_github_history(config, interval):
     pr_review_list_open = git_hub_plugin.get_pull_requests_review_in_progress()
     formatting('Issues Created', issue_list)
     formatting('Issues Assigned', assigned_issue_list)
-    formatting('PR Raised', pr_list)
-    formatting('PR Merged', pr_closed_list)
+    formatting('PR Raised this week', pr_list)
+    formatting('PR Raised and now Merged Status', pr_closed_list)
     formatting('PR Reviewed Closed Status', pr_review_list_closed)
     formatting('PR Reviewed Open Status', pr_review_list_open)
 

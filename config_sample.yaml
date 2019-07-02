@@ -9,6 +9,7 @@ email_id: <Email ID>
 git_urls:
 - https://github.com/SatelliteQE/robottelo
 - https://github.com/SatelliteQE/satellite6-upgrade
+github_token: <Github Token>
 github_username: <Github Username>
 label_check: false
 project: <Project Name>
