@@ -3,13 +3,13 @@
 
 Jirasync is a CLI tool which collects all GitHub Issues, PR, PR_Reviews and tracks Jira tasks for those. Currently, it is only designed for a single user who syncs his GitHub work history in Jira by running some commands for an interval of a week.
 
-![](https://github.com/omkarkhatavkar/jirasync/jirasync_1.gif)
+![](https://github.com/omkarkhatavkar/jirasync/img/jirasync_1.gif)
  <p align="center">  
  Sync and Track your GitHub work with JIRA  
     <br />  
  <a href="https://github.com/omkarkhatavkar/jirasync
  "><strong>Explore the docs »</strong></a>  
- <br /> <br /> <a href="https://github.com/omkarkhatavkar/jirasync/jirasync_1.gif">View Demo</a>  
+ <br /> <br /> <a href="https://github.com/omkarkhatavkar/jirasync/img/jirasync_1.gif">View Demo</a>  
   ·  
     <a href="https://github.com/omkarkhatavkar/jirasync/issues">Report Bug</a>  
   ·  

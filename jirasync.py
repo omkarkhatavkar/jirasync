@@ -96,7 +96,7 @@ def cli(debug):
 @pass_config
 def set_config(config, git_urls, jira_url, github_username, github_token,
                jira_username, jira_email_id, jira_board, jira_project):
-    """Set git_urls and github username"""
+    """Set configuration in jirasync before start using it"""
     if os.path.exists(config.config_file):
         os.unlink(config.config_file)
     try:
@@ -137,7 +137,7 @@ def set_config(config, git_urls, jira_url, github_username, github_token,
               help="please pass interval e.g. week, day")
 @pass_config
 def check_github_history(config, interval):
-    """See GitHub History result based on intervals
+    """see github work history result based on intervals
      e.g. jirasync check-github-history --interval week """
     if interval not in ['week', 'day']:
         echo_error("Please pass correct interval. e.g. 'week', 'day'")
@@ -170,8 +170,8 @@ def check_github_history(config, interval):
               help="please pass interval e.g. week, day")
 @pass_config
 def start_syncing(config, interval):
-    """Sync github issues, pr, pr_reviews as Jira tasks.
-    Currently supported day and week interval
+    """sync github issues, pr, pr_reviews as jira tasks for individual user.
+    currently supported day and week interval
     e.g. jirasync start-syncing --interval week
     """
     if interval not in ['week', 'day']:
@@ -207,9 +207,8 @@ def start_syncing(config, interval):
               help="please pass interval e.g. week, day")
 @pass_config
 def show_team_history(config, interval):
-    """Sync github issues, pr, pr_reviews as Jira tasks.
-    Currently supported day and week interval for
-    all users mentioned in team.yaml
+    """see github work history for a team based on intervals
+    all users should mentioned in team.yaml
     e.g. jirasync show_team_history --interval week
     """
     teams = get_yaml_data(config.team_file)
@@ -244,8 +243,8 @@ def show_team_history(config, interval):
               help="please pass interval e.g. week, day")
 @pass_config
 def start_syncing_team(config, interval):
-    """Sync github issues, pr, pr_reviews as Jira tasks.
-    Currently supported day and week interval for
+    """sync github issues, pr, pr_reviews as jira tasks for whole team.
+    currently supported day and week interval for
     all users mentioned in team.yaml
     e.g. jirasync start-syncing-team --interval week
     """
