@@ -1,19 +1,30 @@
 SATQE:
-    auth:
-      basic_auth: false
-      kerberos: true
-      username: <Username>
-    board: <BoardName>
-    ca_cert_path: <Certpath>
-    check_for_updates: 'false'
-    email_id: <email_id>
+    board: <Jira Board Name>
+    email_id: <Email Id>
     git_urls:
     - https://github.com/SatelliteQE/robottelo
     - https://github.com/SatelliteQE/satellite6-upgrade
-    github_token: <github token>
-    github_usernames: [<github_username_1>, <github_username_2>]
-    label_check: false
-    project: <JiraProject Name>
-    url: <Jira URL>
-    verify_ssl: true
-
+    github_token: <Git Hub Token>
+    Users:
+    #you can write all the users in mentioned below way
+      Omkar Khatavkar:
+        github_username: omkarkhatavkar
+        jira_username: okhatavk
+      Jitendra Yejare:
+        github_username: jyejare
+        jira_username: jyejare
+PulpQE:
+    board: <Jira Board Name>
+    email_id: <Email Id>
+    git_urls:
+    - https://github.com/SatelliteQE/robottelo
+    - https://github.com/SatelliteQE/satellite6-upgrade
+    github_token: <Git Hub Token>
+    Users:
+    #you can write all the users in mentioned below way
+      Omkar Khatavkar:
+        github_username: omkarkhatavkar
+        jira_username: okhatavk
+      Jitendra Yejare:
+        github_username: jyejare
+        jira_username: jyejare

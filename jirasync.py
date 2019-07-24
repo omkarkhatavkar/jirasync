@@ -96,7 +96,7 @@ def cli(debug):
 @pass_config
 def set_config(config, git_urls, jira_url, github_username, github_token,
                jira_username, jira_email_id, jira_board, jira_project):
-    """Set git_urls and github username"""
+    """Set configuration in jirasync before start using it"""
     if os.path.exists(config.config_file):
         os.unlink(config.config_file)
     try:
@@ -133,11 +133,11 @@ def set_config(config, git_urls, jira_url, github_username, github_token,
 
 
 @cli.command()
-@click.option('--interval', default='week',
+@click.option('--interval', default='day',
               help="please pass interval e.g. week, day")
 @pass_config
 def check_github_history(config, interval):
-    """See GitHub History result based on intervals
+    """see github work history result based on intervals
      e.g. jirasync check-github-history --interval week """
     if interval not in ['week', 'day']:
         echo_error("Please pass correct interval. e.g. 'week', 'day'")
@@ -166,12 +166,12 @@ def check_github_history(config, interval):
 
 
 @cli.command()
-@click.option('--interval', default='week',
+@click.option('--interval', default='day',
               help="please pass interval e.g. week, day")
 @pass_config
 def start_syncing(config, interval):
-    """Sync github issues, pr, pr_reviews as Jira tasks.
-    Currently supported day and week interval
+    """sync github issues, pr, pr_reviews as jira tasks for individual user.
+    currently supported day and week interval
     e.g. jirasync start-syncing --interval week
     """
     if interval not in ['week', 'day']:
@@ -183,7 +183,9 @@ def start_syncing(config, interval):
     yaml_data = get_yaml_data(config.config_file)
     git_hub_plugin = GitHubPlugin(yaml_data['github_username'],
                                   yaml_data['email_id'],
-                                  interval, yaml_data['git_urls']
+                                  interval,
+                                  yaml_data['git_urls'],
+                                  yaml_data['github_token']
                                   )
     created_issue_list = git_hub_plugin.get_github_issues_created_list()
     assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
@@ -205,22 +207,23 @@ def start_syncing(config, interval):
               help="please pass interval e.g. week, day")
 @pass_config
 def show_team_history(config, interval):
-    """Sync github issues, pr, pr_reviews as Jira tasks.
-    Currently supported day and week interval for
-    all users mentioned in team.yaml
+    """see github work history for a team based on intervals
+    all users should mentioned in team.yaml
     e.g. jirasync show_team_history --interval week
     """
     teams = get_yaml_data(config.team_file)
     for team in teams:
         print("For Team ==> {}".format(team))
-        for github_username in teams[team]['github_usernames']:
-            print("For User ==> {}".format(github_username))
-            git_hub_plugin = GitHubPlugin(github_username,
-                                          teams[team]['email_id'],
-                                          interval,
-                                          teams[team]['git_urls'],
-                                          teams[team]['github_token']
-                                          )
+        users = teams[team]['Users']
+        for user in users:
+            print("For User ==> {}".format(users[user]['github_username']))
+            git_hub_plugin = GitHubPlugin(
+                users[user]['github_username'],
+                teams[team]['email_id'],
+                interval,
+                teams[team]['git_urls'],
+                teams[team]['github_token']
+            )
             created_issue_list = git_hub_plugin.get_github_issues_created_list()
             assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
             pr_list = git_hub_plugin.get_opened_pull_requests()
@@ -240,32 +243,79 @@ def show_team_history(config, interval):
               help="please pass interval e.g. week, day")
 @pass_config
 def start_syncing_team(config, interval):
-    """Sync github issues, pr, pr_reviews as Jira tasks.
-    Currently supported day and week interval for
+    """sync github issues, pr, pr_reviews as jira tasks for whole team.
+    currently supported day and week interval for
     all users mentioned in team.yaml
     e.g. jirasync start-syncing-team --interval week
     """
     teams = get_yaml_data(config.team_file)
     for team in teams:
         print("For Team ==> {}".format(team))
-        for github_username in teams[team]['github_usernames']:
-            print("For User ==> {}".format(github_username))
-            git_hub_plugin = GitHubPlugin(github_username,
-                                          teams[team]['email_id'],
-                                          interval,
-                                          teams[team]['git_urls'],
-                                          teams[team]['github_token']
-                                          )
+        users = teams[team]['Users']
+        for user in users:
+            print("For User ==> {}".format(users[user]['github_username']))
+            git_hub_plugin = GitHubPlugin(
+                users[user]['github_username'],
+                teams[team]['email_id'],
+                interval,
+                teams[team]['git_urls'],
+                teams[team]['github_token']
+            )
+
             created_issue_list = git_hub_plugin.get_github_issues_created_list()
             assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
             pr_list = git_hub_plugin.get_opened_pull_requests()
             pr_closed_list = git_hub_plugin.get_pull_requests_merged_closed()
             pr_review_list_closed = git_hub_plugin.get_pull_requests_reviewed()
             pr_review_list_open = git_hub_plugin.get_pull_requests_review_in_progress()
-            jira = MyJiraWrapper('team.yaml', 'labels.yaml')
-            start_issue_workflow(github_issues=created_issue_list, jira=jira)
-            start_issue_workflow(github_issues=assigned_issue_list, jira=jira)
-            start_create_pull_requests_workflow(github_issues=pr_list, jira=jira)
-            start_create_pull_requests_workflow(github_issues=pr_closed_list, jira=jira)
-            start_review_pull_requests_workflow(github_issues=pr_review_list_closed, jira=jira)
-            start_review_pull_requests_workflow(github_issues=pr_review_list_open, jira=jira)
+            jira = MyJiraWrapper('config.yaml', 'labels.yaml')
+            start_issue_workflow(github_issues=created_issue_list,
+                                 jira=jira,
+                                 assignee=users[user]['jira_username'])
+            start_issue_workflow(
+                github_issues=assigned_issue_list,
+                jira=jira,
+                assignee=users[user]['jira_username']
+            )
+            start_create_pull_requests_workflow(
+                github_issues=pr_list,
+                jira=jira,
+                assignee=users[user]['jira_username']
+            )
+            start_create_pull_requests_workflow(
+                github_issues=pr_closed_list,
+                jira=jira,
+                assignee=users[user]['jira_username']
+            )
+            start_review_pull_requests_workflow(
+                github_issues=pr_review_list_closed,
+                jira=jira,
+                assignee=users[user]['jira_username']
+            )
+            start_review_pull_requests_workflow(
+                github_issues=pr_review_list_open,
+                jira=jira,
+                assignee=users[user]['jira_username']
+            )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

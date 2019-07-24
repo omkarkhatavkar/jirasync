@@ -2,6 +2,7 @@ auth:
   basic_auth: false
   kerberos: true
   username: <Username>
+  password: <Password>
 board: <Board Name>
 ca_cert_path: <Cert Path>
 check_for_updates: 'false'
