@@ -8,7 +8,7 @@ from wrappers.workflow_wrapper import (
 )
 
 
-def start_issue_workflow(github_issues, jira):
+def start_issue_workflow(github_issues, jira, assignee=None):
     # create issue if those are not created
     for issue in github_issues:
         issue_text = str('issue#'+issue.project+'#'+issue.id)
@@ -21,12 +21,17 @@ def start_issue_workflow(github_issues, jira):
             update_existing_issue_in_current_sprint(tasks[0], issue, jira=jira)
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error("Creating Issue task for.....{}".format(issue.data['url']))
-            create_new_issue_in_backlog(issue, jira=jira, issue_text=issue_text)
+            create_new_issue_in_backlog(
+                issue,
+                jira=jira,
+                issue_text=issue_text,
+                assignee=assignee
+            )
         else:
             print("Nothing Happened")
 
 
-def start_create_pull_requests_workflow(github_issues, jira):
+def start_create_pull_requests_workflow(github_issues, jira, assignee=None):
     # Create PR task if those are not created
     for issue in github_issues:
         pr_text = str('pr#' + issue.project + '#' + issue.id)
@@ -39,12 +44,17 @@ def start_create_pull_requests_workflow(github_issues, jira):
             update_existing_issue_in_current_sprint(tasks[0], issue, jira=jira)
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error("Creating PR task for.....{}".format(issue.data['url']))
-            create_pull_request_in_current_sprint(issue, jira=jira, issue_text=pr_text)
+            create_pull_request_in_current_sprint(
+                issue,
+                jira=jira,
+                issue_text=pr_text,
+                assignee=assignee
+            )
         else:
             print("Nothing Happened")
 
 
-def start_review_pull_requests_workflow(github_issues, jira):
+def start_review_pull_requests_workflow(github_issues, jira, assignee=None):
     # Create PR task if those are not created
     for issue in github_issues:
         pr_review_text = str('pr_review#' + issue.project + '#' + issue.id)
@@ -57,6 +67,11 @@ def start_review_pull_requests_workflow(github_issues, jira):
             update_existing_issue_in_current_sprint(tasks[0], issue, jira=jira)
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error("Creating PR review task for .....{}".format(issue.data['url']))
-            create_pull_request_in_current_sprint(issue, jira=jira, issue_text=pr_review_text)
+            create_pull_request_in_current_sprint(
+                issue,
+                jira=jira,
+                issue_text=pr_review_text,
+                assignee=assignee
+            )
         else:
             print("Nothing Happened")

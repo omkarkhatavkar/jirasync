@@ -4,16 +4,18 @@ from utils.utils import (
 )
 
 
-def create_new_issue_in_backlog(issue, jira, issue_text):
+def create_new_issue_in_backlog(issue, jira, issue_text, assignee=None):
+    if assignee is None:
+        assignee = jira.userid.encode()
     if isinstance(jira, MyJiraWrapper):
         if issue_text is not None:
             params = {
-                'summary': "{} -{}".format(issue_text, issue.title),
+                'summary': "{}#{} -{}".format(issue_text, assignee, issue.title),
                 'details': "{}".format(issue.data['body']),
                 'component': 'Automation',
                 'labels': ['Automation'],
                 'sprint': 'backlog',
-                'assignee': jira.userid.encode(),  # FIXME
+                'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }
             created_issue = jira.create_issue(**params)
@@ -21,16 +23,18 @@ def create_new_issue_in_backlog(issue, jira, issue_text):
                                                                      created_issue.key.encode()))
 
 
-def create_pull_request_in_current_sprint(issue, jira, issue_text):
+def create_pull_request_in_current_sprint(issue, jira, issue_text, assignee=None):
+    if assignee is None:
+        assignee = jira.userid.encode()
     if isinstance(jira, MyJiraWrapper):
         if issue_text is not None:
             params = {
-                'summary': "{} -{}".format(issue_text, issue.title),
+                'summary': "{}#{} -{}".format(issue_text, assignee, issue.title),
                 'details': "{}".format(issue.data['body']),
                 'component': 'Automation',
                 'labels': ['Automation'],
                 'sprint': jira.current_sprint_name.encode(),
-                'assignee': jira.userid.encode(),  # FIXME
+                'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }
             created_issue = jira.create_issue(**params)
@@ -38,16 +42,18 @@ def create_pull_request_in_current_sprint(issue, jira, issue_text):
                                                                      created_issue.key.encode()))
 
 
-def create_pull_request_review_in_current_sprint(issue, jira, issue_text):
+def create_pull_request_review_in_current_sprint(issue, jira, issue_text, assignee=None):
+    if assignee is None:
+        assignee = jira.userid.encode()
     if isinstance(jira, MyJiraWrapper):
         if issue_text is not None:
             params = {
-                'summary': "{} -{}".format(issue_text, issue.title),
+                'summary': "{}#{} -{}".format(issue_text, assignee, issue.title),
                 'details': "{}".format(issue.data['body']),
                 'component': 'Automation',
                 'labels': ['Automation'],
                 'sprint': jira.current_sprint_name.encode(),
-                'assignee': jira.userid.encode(),  # FIXME
+                'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }
             created_issue = jira.create_issue(**params)
