@@ -1,7 +1,7 @@
 
 ![](https://i.ibb.co/d4Y6Frs/2d524aa8-8c79-4562-bfd9-a3f8a85536df-200x200.png)
 
-Jirasync is a CLI tool which collects all GitHub Issues, PR, PR_Reviews and tracks Jira tasks for those. Currently, it is only designed for a single user who syncs his GitHub work history in Jira by running some commands for an interval of a week.
+Jirasync is a CLI tool which collects all GitHub Issues, PR, PR_Reviews and Create them as Jira tasks. It will handle the whole lifecycle of jira task from Assigment => Adding to Current Sprint => Updating correct status. Currently, it is designed for a Single User and MultiUser who wants syncs his GitHub work history in Jira by running some commands.
 
 ![](https://raw.githubusercontent.com/omkarkhatavkar/jirasync/master/img/jirasync_1.gif)
  <p align="center">  
@@ -52,7 +52,7 @@ After install, make sure to run `jirasync set-config` successfully to set config
     $ git clone https://github.com/omkarkhatavkar/jirasync.git
     $ cd jirasync/
     $ chmod +x setup.sh
-    $ ./setup.sh
+    $ source ./setup.sh
 
   <!-- ## Workflow -->  
 ## Workflow
@@ -82,7 +82,7 @@ Case2: Issues status is automatically updated once issue closed in GitHub
 
   
 
-![](https://lh6.googleusercontent.com/Qqy_LIJ0N9oQ6zDg673D5VA_uJKsM_jid1GBLPdPTuEFLia3fpvdu1gb4lgG3nV3GzWQM8EMTEozxjHB_NJ1Uhsq9ffOIeYeVaWWsM3RxZCZpbh2xsZYU1w0li70DjDKZ0frm5Cq)
+![](hGttps://lh6.googleusercontent.com/Qqy_LIJ0N9oQ6zDg673D5VA_uJKsM_jid1GBLPdPTuEFLia3fpvdu1gb4lgG3nV3GzWQM8EMTEozxjHB_NJ1Uhsq9ffOIeYeVaWWsM3RxZCZpbh2xsZYU1w0li70DjDKZ0frm5Cq)
 
 Case3: Auto PR Create/Closed (Done) manage by Jirasync
 
@@ -189,7 +189,7 @@ PRs are welcome. To begin developing, do this:
 $ git https://github.com/omkarkhatavkar/jirasync.git
 $ cd jirasync
 $ chmod +x setup.sh
-$ ./setup.sh
+$ source ./setup.sh
 ```
 
 <!-- LICENSE -->  
