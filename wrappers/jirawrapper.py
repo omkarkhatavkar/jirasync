@@ -49,10 +49,12 @@ class MyJiraWrapper(JiraWrapper):
         if assignee:
             self.jira.assign_issue(new_issue.key, assignee)
 
-        if sprint == "backlog":
-            self.jira.move_to_backlog([new_issue.key])
-        else:
-            self.jira.add_issues_to_sprint(sprint_id, [new_issue.key])
+        # FIXME: Uncomment after testing, this was disabled because of
+        #        containerized Jira has no scrum plugin.
+        # if sprint == "backlog":
+        #     self.jira.move_to_backlog([new_issue.key])
+        # else:
+        #     self.jira.add_issues_to_sprint(sprint_id, [new_issue.key])
 
         return new_issue
 

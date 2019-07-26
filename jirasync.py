@@ -18,6 +18,9 @@ from utils.utils import (
 from plugins.github import (
     GitHubPlugin,
 )
+from plugins.redmine import (
+    RedminePlugin,
+)
 
 
 class Config(object):
@@ -299,10 +302,38 @@ def start_syncing_team(config, interval):
             )
 
 
-
-
-
-
+@cli.command()
+@click.option(
+    '--sync',
+    default=False,
+    is_flag=True,
+    help="if not provided will only print"
+)
+@pass_config
+def redmine(config, sync):
+    teams = get_yaml_data(config.team_file)
+    config_data = get_yaml_data(config.config_file)
+    redmine_plugin = RedminePlugin(
+        config_data['redmine_url'],
+        config_data['redmine_username'],
+        config_data['redmine_password'],
+        config_data['redmine_task_prefix'],
+        sync=sync,
+        jira=MyJiraWrapper('config.yaml', 'labels.yaml')
+    )
+    for team in teams:
+        click.echo("For Team ==> {}".format(team))
+        users = teams[team]['Users']
+        for user in users:
+            redmine_userid = users[user].get('redmine_userid')
+            jira_username = users[user].get('jira_username')
+            if not redmine_userid:
+                click.echo(
+                    "User {0} has no redmine configuration.".format(user)
+                )
+                continue
+            click.echo("For User ==> {0}:{1}".format(user, redmine_userid))
+            redmine_plugin.process_issues(redmine_userid, jira_username)
 
 
 
