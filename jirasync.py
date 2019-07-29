@@ -307,10 +307,22 @@ def start_syncing_team(config, interval):
     '--sync',
     default=False,
     is_flag=True,
-    help="if not provided will only print"
+    help="Perform the writes to Jira"
 )
 @pass_config
 def redmine(config, sync):
+    """Reads issues from redmine for users defined on `team.yaml` and sync
+    with Jira. By default runs in a `check only` mode (no write is performed)
+    to write to jira add `--sync` to the command line.
+
+    Expects Redmine and Jira config on `config.yaml` and users information on
+    `team.yaml`. See `team_sample.yaml` and `config_sample.yaml` for examples.
+    """
+    if not sync:
+        echo_error(
+            "Running on check-only mode, to write to Jira add `--sync` "
+            "to the command line"
+        )
     teams = get_yaml_data(config.team_file)
     config_data = get_yaml_data(config.config_file)
     redmine_plugin = RedminePlugin(
@@ -334,19 +346,3 @@ def redmine(config, sync):
                 continue
             click.echo("For User ==> {0}:{1}".format(user, redmine_userid))
             redmine_plugin.process_issues(redmine_userid, jira_username)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

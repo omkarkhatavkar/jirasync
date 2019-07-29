@@ -8,7 +8,7 @@ class RedminePlugin(object):
         redmine_url,
         redmine_username,
         redmine_password,
-        redmine_task_prefix=None,
+        redmine_task_prefix="redmine",
         sync=False,
         jira=None
     ):
@@ -37,9 +37,8 @@ class RedminePlugin(object):
             prefix=self.redmine_task_prefix,
             issue=issue
         )
-        echo("Searching Jira for {0}".format(issue_text))
+
         # check if it already exists
-        # tasks = self.jira.search_task_by_summary(text=issue_text)
         search_query = (
             'project = {} '
             'AND status != Done '
@@ -50,12 +49,16 @@ class RedminePlugin(object):
             jira_username,
             issue_text.replace('#', '\u0023')
         )
-        print(search_query)
+        echo(
+            "Searching Jira for {0} using query [{1}]".format(
+                issue_text, search_query
+            )
+        )
         tasks = self.jira.jira.search_issues(
             search_query
         )
-        print(tasks)
         task_count = len(tasks)
+        echo("Found {}: {}".format(task_count, tasks))
         if task_count > 1:
             echo_error("Duplicated task found for {0}".format(issue_text))
         elif task_count == 1:
@@ -67,28 +70,32 @@ class RedminePlugin(object):
             self.create_task(issue, issue_text, jira_username)
 
     def update_task(self, task, issue, issue_text, jira_username):
-        echo('Updating existing task {0}'.format(task))
-
         if task.fields.status.name.encode() == 'Done':
-            echo_skip("No Need to Update! Task already Done!")
+            echo_skip("No Need to Update! Task already Done on Jira!")
         else:
             if 'close' in issue.status.name.lower() and self.sync:
                 self.jira.change_status(task.id.encode(), 'Done')
-                echo_skip(
-                    "Status Updated Jira .....{}/browse/{}".format(
-                        self.jira.jira_url, task.key.encode()
-                    )
-                )
-
-                echo(
-                    'Task: {0}/{1}[{issue.status}] status updated'.format(
-                        task, issue_text, issue=issue
+                echo_success(
+                    "Updated status of {0}/{1}[{issue.status}] "
+                    "...{2}/browse/{3}".format(
+                        task,
+                        issue_text,
+                        self.jira.jira_url,
+                        task.key.encode(),
+                        issue=issue
                     )
                 )
             else:
-                echo(
-                    'Task: {0}/{1}[{issue.status}] no status update'.format(
-                        task, issue_text, issue=issue
+                echo_skip(
+                    'Skipping: {0}/{1}[{issue.status}] {msg}'.format(
+                        task,
+                        issue_text,
+                        issue=issue,
+                        msg=(
+                            "`--sync` is disabled"
+                            if not self.sync
+                            else "no status update"
+                        )
                     )
                 )
 
@@ -104,11 +111,10 @@ class RedminePlugin(object):
         """
         if 'close' in issue.status.name.lower():
             echo_skip(
-                'Issue {0} already closed, skipping'.format(issue.id)
+                'Issue {0} is closed on redmine, skipping'.format(issue.id)
             )
             return
 
-        echo("Creating a new task on Jira for {0}".format(issue_text))
         params = {
             'summary': "{}{} - {}".format(
                 issue_text,
@@ -122,25 +128,29 @@ class RedminePlugin(object):
             'assignee': jira_username,  # FIXME
             'issuetype': 'Task',
         }
+
         if self.sync:
             created_issue = self.jira.create_issue(**params)
             echo_success(
-                "Created Jira ............{}/browse/{}".format(
+                "Created Jira {}...{}/browse/{}".format(
+                    issue_text,
                     self.jira.jira_url,
                     created_issue.key.encode()
                 )
             )
         else:
-            echo("New task to be created on Jira: ".format(params))
+            echo_skip(
+                "{} to be created on Jira with {} ".format(issue_text, params)
+            )
 
     def process_issues(self, redmine_userid, jira_username):
         issues = self.get_issues(redmine_userid)
-        echo("A total of {0} issues to process.".format(len(issues)))
+        echo("# A total of {0} issues to process.".format(len(issues)))
         if not jira_username:
             jira_username = self.jira.userid.encode()
         for issue in issues:
             echo(
-                "Processing: {issue}:{issue.id} - status: {issue.status}"
+                "\n## Processing: {issue}:{issue.id} - status: {issue.status}"
                 .format(issue=issue)
             )
             self.do_sync(issue, jira_username)
