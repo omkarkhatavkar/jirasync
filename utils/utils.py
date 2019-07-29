@@ -5,16 +5,21 @@ import os
 from datetime import datetime, timedelta
 
 
+def echo(msg):
+    """Just a wrapper to enable overloading and mocking"""
+    click.echo(msg)
+
+
 def echo_success(msg):
-    click.echo(click.style(msg, fg='green'))
+    echo(click.style(msg, fg='green'))
 
 
 def echo_error(msg):
-    click.echo(click.style(msg, fg='red'))
+    echo(click.style(msg, fg='red'))
 
 
 def echo_skip(msg):
-    click.echo(click.style(msg, fg='cyan'))
+    echo(click.style(msg, fg='cyan'))
 
 
 def update_yaml(file_name, content):

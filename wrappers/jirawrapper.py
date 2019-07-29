@@ -49,10 +49,14 @@ class MyJiraWrapper(JiraWrapper):
         if assignee:
             self.jira.assign_issue(new_issue.key, assignee)
 
-        if sprint == "backlog":
-            self.jira.move_to_backlog([new_issue.key])
-        else:
-            self.jira.add_issues_to_sprint(sprint_id, [new_issue.key])
+        try:
+            if sprint == "backlog":
+                self.jira.move_to_backlog([new_issue.key])
+            else:
+                self.jira.add_issues_to_sprint(sprint_id, [new_issue.key])
+        except IndexError:
+            # Some Jira installations have no Scrum plugin so no backlog exists
+            pass
 
         return new_issue
 
