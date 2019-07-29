@@ -1,5 +1,5 @@
 from redminelib import Redmine
-from utils.utils import echo, echo_error, echo_success
+from utils.utils import echo, echo_error, echo_success, echo_skip
 
 
 class RedminePlugin(object):
@@ -23,79 +23,94 @@ class RedminePlugin(object):
 
     def get_issues(self, redmine_userid):
         user = self.redmine.user.get(redmine_userid)
-
-        open_issues = list(
-            self.redmine.issue.filter(assigned_to_id=user.id, status_id='open')
+        return list(
+            # use (status_id='open|closed') to filter out issues
+            self.redmine.issue.filter(assigned_to_id=user.id, status_id='*')
         )
-        closed_issues = list(
-            self.redmine.issue.filter(
-                assigned_to_id=user.id,
-                status_id='closed'
-            )
-        )
-        all_issues = open_issues + closed_issues
-
-        return {
-            'open': open_issues,
-            'closed': closed_issues,
-            'all': all_issues
-        }
 
     def do_sync(self, issue, jira_username):
-        """
-        [u'assigned_to',
-        u'attachments',
-        u'author',
-        u'changesets',
-        u'children',
-        u'closed_on',
-        u'created_on',
-        u'custom_fields',
-        u'description',
-        u'done_ratio',
-        u'id',
-        u'journals',
-        u'priority',
-        u'project',
-        u'relations',
-        u'status',
-        u'subject',
-        u'time_entries',
-        u'tracker',
-        u'updated_on',
-        u'watchers']
-        """
         if not self.jira:
             echo_error("Jira Wrapper is not Available")
             return
         # build the unique issue_text prefix
-        issue_text = '{prefix}#{issue.project}#{issue.id}'.format(
+        issue_text = '{prefix}#{issue.project}#{issue.id}#'.format(
             prefix=self.redmine_task_prefix,
             issue=issue
         )
         echo("Searching Jira for {0}".format(issue_text))
         # check if it already exists
-        tasks = self.jira.search_task_by_summary(text=issue_text)
+        # tasks = self.jira.search_task_by_summary(text=issue_text)
+        search_query = (
+            'project = {} '
+            'AND status != Done '
+            'AND assignee = {} '
+            'AND summary ~ \\"{}\\"'
+        ).format(
+            self.jira.project_id,
+            jira_username,
+            issue_text.replace('#', '\u0023')
+        )
+        print(search_query)
+        tasks = self.jira.jira.search_issues(
+            search_query
+        )
+        print(tasks)
         task_count = len(tasks)
         if task_count > 1:
             echo_error("Duplicated task found for {0}".format(issue_text))
         elif task_count == 1:
             # update existing issue
-            self.update_task(tasks[0], issue, jira_username)
+            self.update_task(tasks[0], issue, issue_text, jira_username)
         else:
             # create a new assigned issue in backlog
+            # if issue is not already closed
             self.create_task(issue, issue_text, jira_username)
 
-    def update_task(self, task, issue, jira_username):
+    def update_task(self, task, issue, issue_text, jira_username):
         echo('Updating existing task {0}'.format(task))
-        if self.sync:
-            # FIXME: Implement the update
-            pass
+
+        if task.fields.status.name.encode() == 'Done':
+            echo_skip("No Need to Update! Task already Done!")
+        else:
+            if 'close' in issue.status.name.lower() and self.sync:
+                self.jira.change_status(task.id.encode(), 'Done')
+                echo_skip(
+                    "Status Updated Jira .....{}/browse/{}".format(
+                        self.jira.jira_url, task.key.encode()
+                    )
+                )
+
+                echo(
+                    'Task: {0}/{1}[{issue.status}] status updated'.format(
+                        task, issue_text, issue=issue
+                    )
+                )
+            else:
+                echo(
+                    'Task: {0}/{1}[{issue.status}] no status update'.format(
+                        task, issue_text, issue=issue
+                    )
+                )
 
     def create_task(self, issue, issue_text, jira_username):
+        """ Creates a new task on Jira based on Redmine issue.
+
+        Fields available on `issue` object:
+            [u'assigned_to', u'attachments', u'author', u'changesets',
+            u'children', u'closed_on', u'created_on', u'custom_fields',
+            u'description', u'done_ratio', u'id', u'journals', u'priority',
+            u'project', u'relations', u'status', u'subject', u'time_entries',
+            u'tracker', u'updated_on', u'watchers']
+        """
+        if 'close' in issue.status.name.lower():
+            echo_skip(
+                'Issue {0} already closed, skipping'.format(issue.id)
+            )
+            return
+
         echo("Creating a new task on Jira for {0}".format(issue_text))
         params = {
-            'summary': "{}#{} -{}".format(
+            'summary': "{}{} - {}".format(
                 issue_text,
                 jira_username,
                 issue.subject
@@ -115,12 +130,15 @@ class RedminePlugin(object):
                     created_issue.key.encode()
                 )
             )
+        else:
+            echo("New task to be created on Jira: ".format(params))
 
     def process_issues(self, redmine_userid, jira_username):
         issues = self.get_issues(redmine_userid)
+        echo("A total of {0} issues to process.".format(len(issues)))
         if not jira_username:
             jira_username = self.jira.userid.encode()
-        for issue in issues['all']:
+        for issue in issues:
             echo(
                 "Processing: {issue}:{issue.id} - status: {issue.status}"
                 .format(issue=issue)
