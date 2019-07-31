@@ -42,11 +42,9 @@ class RedminePlugin(object):
         search_query = (
             'project = {} '
             'AND status != Done '
-            'AND assignee = {} '
             'AND summary ~ \\"{}\\"'
         ).format(
             self.jira.project_id,
-            jira_username,
             issue_text.replace('#', '\u0023')
         )
         echo(
@@ -73,6 +71,16 @@ class RedminePlugin(object):
         if task.fields.status.name.encode() == 'Done':
             echo_skip("No Need to Update! Task already Done on Jira!")
         else:
+            if task.fields.assignee.key != jira_username:
+                # Assignee has changed needs update the task
+                self.jira.change_assignee(task.id.encode(), jira_username)
+                echo_success(
+                    'Assignee changed from {} to {}'.format(
+                        task.fields.assignee.key,
+                        jira_username
+                    )
+                )
+
             if 'close' in issue.status.name.lower() and self.sync:
                 self.jira.change_status(task.id.encode(), 'Done')
                 echo_success(
@@ -116,11 +124,7 @@ class RedminePlugin(object):
             return
 
         params = {
-            'summary': "{}{} - {}".format(
-                issue_text,
-                jira_username,
-                issue.subject
-            ),
+            'summary': "{} - {}".format(issue_text, issue.subject),
             'details': "{}".format(issue.description),
             'component': 'Automation',
             'labels': ['Automation', self.redmine_task_prefix],

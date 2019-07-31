@@ -66,6 +66,11 @@ class MyJiraWrapper(JiraWrapper):
         new_status_id = self.get_avail_status_id(avail_statuses, new_status_name)
         self.jira.transition_issue(issue, new_status_id)
 
+    def change_assignee(self, issue_name, new_assignee):
+        issue = self.jira.issue(issue_name)
+        f = IssueFields().assignee(new_assignee)
+        issue.update(**f.kwarg)
+
     def update_sprint(self, issue_name):
         issue = self.jira.issue(issue_name)
         current_sprint_id = self.current_sprint_id
