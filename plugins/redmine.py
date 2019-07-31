@@ -125,7 +125,10 @@ class RedminePlugin(object):
 
         params = {
             'summary': "{} - {}".format(issue_text, issue.subject),
-            'details': "{}".format(issue.description),
+            'details': "Source: {}\n{}".format(
+                "{}/issues/{}".format(self.redmine.url, issue.id),
+                issue.description
+            ),
             'component': 'Automation',
             'labels': ['Automation', self.redmine_task_prefix],
             'sprint': 'backlog',
