@@ -10,8 +10,10 @@ def create_new_issue_in_backlog(issue, jira, issue_text, assignee=None):
     if isinstance(jira, MyJiraWrapper):
         if issue_text is not None:
             params = {
-                'summary': "{}#{} -{}".format(issue_text, assignee, issue.title),
-                'details': "{}".format(issue.data['body']),
+                'summary': "{} -{}".format(issue_text, issue.title),
+                'details': "Source : {}\n{}".format(issue.data['html_url'].encode(),
+                                                    issue.data['body']),
+                'component': 'Automation',
                 'component': 'Automation',
                 'labels': ['Automation'],
                 'sprint': 'backlog',
@@ -29,11 +31,12 @@ def create_pull_request_in_current_sprint(issue, jira, issue_text, assignee=None
     if isinstance(jira, MyJiraWrapper):
         if issue_text is not None:
             params = {
-                'summary': "{}#{} -{}".format(issue_text, assignee, issue.title),
-                'details': "{}".format(issue.data['body']),
+                'summary': "{} -{}".format(issue_text, issue.title),
+                'details': "Source : {}\n{}".format(issue.data['html_url'].encode(),
+                                                    issue.data['body']),
                 'component': 'Automation',
                 'labels': ['Automation'],
-                'sprint': jira.current_sprint_name.encode(),
+                'sprint': 'backlog',
                 'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }
@@ -49,10 +52,12 @@ def create_pull_request_review_in_current_sprint(issue, jira, issue_text, assign
         if issue_text is not None:
             params = {
                 'summary': "{}#{} -{}".format(issue_text, assignee, issue.title),
-                'details': "{}".format(issue.data['body']),
+                'details': "Source : {}\n{}".format(issue.data['html_url'].encode(),
+                                                    issue.data['body']),
+                'component': 'Automation',
                 'component': 'Automation',
                 'labels': ['Automation'],
-                'sprint': jira.current_sprint_name.encode(),
+                'sprint': 'backlog',
                 'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }
