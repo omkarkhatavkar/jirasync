@@ -1,6 +1,7 @@
 from wrappers.jirawrapper import MyJiraWrapper
 from utils.utils import (
     echo_skip,
+    get_sprint
 )
 
 
@@ -36,7 +37,7 @@ def create_pull_request_in_current_sprint(issue, jira, issue_text, assignee=None
                                                     issue.data['body']),
                 'component': 'Automation',
                 'labels': ['Automation'],
-                'sprint': 'backlog',
+                'sprint': get_sprint(jira),
                 'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }
@@ -57,7 +58,7 @@ def create_pull_request_review_in_current_sprint(issue, jira, issue_text, assign
                 'component': 'Automation',
                 'component': 'Automation',
                 'labels': ['Automation'],
-                'sprint': 'backlog',
+                'sprint': get_sprint(jira),
                 'assignee': assignee,  # FIXME
                 'issuetype': 'Task',
             }

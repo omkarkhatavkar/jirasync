@@ -34,7 +34,7 @@ def start_issue_workflow(github_issues, jira, assignee=None):
 def start_create_pull_requests_workflow(github_issues, jira, assignee=None):
     # Create PR task if those are not created
     for issue in github_issues:
-        pr_text = str('pr_create#' + issue.project + '#' + issue.id)
+        pr_text = "pr_create#{issue.project}#{issue.id}".format(issue=issue)
         tasks = jira.search_task_by_summary(text=pr_text)
         if len(tasks) > 1:
             print("Not a Valid Result! Found more than 1 tasks for"
