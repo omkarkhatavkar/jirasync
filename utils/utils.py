@@ -55,3 +55,10 @@ def configure_interval(interval):
         since = " --since {}".format(week_date)
     return "{}{}".format(since, until)
 
+
+def get_sprint(jira):
+    try:
+        sprint = jira.current_sprint_name.encode()
+    except Exception:
+        sprint = 'backlog'
+    return sprint
