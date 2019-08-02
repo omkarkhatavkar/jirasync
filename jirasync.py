@@ -21,13 +21,13 @@ from plugins.github import (
 from plugins.redmine import (
     RedminePlugin,
 )
+import time
 
 
 class Config(object):
 
     def __init__(self):
         self.config_file = "config.yaml"
-        self.team_file = "team.yaml"
         self.pwd_context = CryptContext(
             schemes=["pbkdf2_sha256"],
             default="pbkdf2_sha256",
@@ -214,7 +214,8 @@ def show_team_history(config, interval):
     all users should mentioned in team.yaml
     e.g. jirasync show_team_history --interval week
     """
-    teams = get_yaml_data(config.team_file)
+    config_data = get_yaml_data(config.config_file)
+    teams = config_data['teams']
     for team in teams:
         print("For Team ==> {}".format(team))
         users = teams[team]['Users']
@@ -251,7 +252,12 @@ def start_syncing_team(config, interval):
     all users mentioned in team.yaml
     e.g. jirasync start-syncing-team --interval week
     """
-    teams = get_yaml_data(config.team_file)
+    try:
+        config_data = get_yaml_data(config.config_file)
+        teams = config_data['teams']
+    except Exception as error:
+        echo_error("ERROR: config.yaml not configured correctly! ")
+        echo_error("Please look at config_sample.yaml file")
     for team in teams:
         print("For Team ==> {}".format(team))
         users = teams[team]['Users']
@@ -267,11 +273,14 @@ def start_syncing_team(config, interval):
 
             created_issue_list = git_hub_plugin.get_github_issues_created_list()
             assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
+            time.sleep(3)
             pr_list = git_hub_plugin.get_opened_pull_requests()
             pr_closed_list = git_hub_plugin.get_pull_requests_merged_closed()
+            time.sleep(3)
             pr_review_list_closed = git_hub_plugin.get_pull_requests_reviewed()
             pr_review_list_open = git_hub_plugin.get_pull_requests_review_in_progress()
-            jira = MyJiraWrapper('config.yaml', 'labels.yaml')
+            time.sleep(3)
+            jira = MyJiraWrapper(config.config_file, config.config_file)
             start_issue_workflow(github_issues=created_issue_list,
                                  jira=jira,
                                  assignee=users[user]['jira_username'])
@@ -323,15 +332,15 @@ def redmine(config, sync):
             "Running on check-only mode, to write to Jira add `--sync` "
             "to the command line"
         )
-    teams = get_yaml_data(config.team_file)
     config_data = get_yaml_data(config.config_file)
+    teams = config_data['teams']
     redmine_plugin = RedminePlugin(
         config_data['redmine_url'],
         config_data['redmine_username'],
         config_data['redmine_password'],
         config_data['redmine_task_prefix'],
         sync=sync,
-        jira=MyJiraWrapper('config.yaml', 'labels.yaml')
+        jira=MyJiraWrapper(config.config_file, config.config_file)
     )
     for team in teams:
         click.echo("For Team ==> {}".format(team))
