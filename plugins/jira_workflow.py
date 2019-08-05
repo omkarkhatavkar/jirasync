@@ -12,7 +12,7 @@ def start_issue_workflow(github_issues, jira, assignee=None):
     # create issue if those are not created
     for issue in github_issues:
         issue_text = str('issue#'+issue.project+'#'+issue.id)
-        tasks = jira.search_task_by_summary(text=issue_text)
+        tasks = jira.search_existing_task(issue_text=issue_text)
         if len(tasks) > 1:
             print("Not a Valid Result! Found more than 1 tasks for"
                   " github {}".format(issue_text))
@@ -35,7 +35,7 @@ def start_create_pull_requests_workflow(github_issues, jira, assignee=None):
     # Create PR task if those are not created
     for issue in github_issues:
         pr_text = "pr_create#{issue.project}#{issue.id}".format(issue=issue)
-        tasks = jira.search_task_by_summary(text=pr_text)
+        tasks = jira.search_existing_task(issue_text=pr_text)
         if len(tasks) > 1:
             print("Not a Valid Result! Found more than 1 tasks for"
                   " github {}".format(pr_text))
@@ -58,7 +58,7 @@ def start_review_pull_requests_workflow(github_issues, jira, assignee=None):
     # Create PR task if those are not created
     for issue in github_issues:
         pr_review_text = str('pr_review#' + issue.project + '#' + issue.id + '#' + assignee)
-        tasks = jira.search_task_by_summary(text=pr_review_text)
+        tasks = jira.search_existing_task(issue_text=pr_review_text)
         if len(tasks) > 1:
             print("Not a Valid Result! Found more than 1 tasks for"
                   " github {}".format(pr_review_text))
