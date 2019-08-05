@@ -398,3 +398,15 @@ def redmine(config, sync):
                 continue
             click.echo("For User ==> {0}:{1}".format(user, redmine_userid))
             redmine_plugin.process_issues(redmine_userid, jira_username)
+
+
+@cli.command()
+@click.option(
+    '--sync',
+    default=False,
+    is_flag=True,
+    help="Perform the writes to Jira"
+)
+@pass_config
+def sync(config, sync):
+    pass
