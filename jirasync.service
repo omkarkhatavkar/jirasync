@@ -1,0 +1,12 @@
+[Unit]
+Description=Jirasync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/var/lib/jirasync/env/bin/jirasync service-run 
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
