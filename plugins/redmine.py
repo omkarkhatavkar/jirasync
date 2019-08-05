@@ -40,7 +40,7 @@ class RedminePlugin(object):
         # check if it already exists
         tasks = self.jira.search_existing_task(issue_text=issue_text)
         task_count = len(tasks)
-        echo("Found {}: {}".format(task_count, tasks))
+        echo("Found {}: {} existing tasks".format(task_count, tasks))
         if task_count > 1:
             echo_error("Duplicated task found for {0}".format(issue_text))
         elif task_count == 1:

@@ -86,12 +86,11 @@ class MyJiraWrapper(JiraWrapper):
             'AND summary ~ \\"{}\\"'
         ).format(
             self.project_id,
-            assignee,
             issue_text.replace('#', '\u0023')
         )
 
         if assignee is not None:
-            search_query = search_query + " AND assignee = {}".format(assignee)
+            search_query += " AND assignee = {}".format(assignee)
         echo(
             "Searching Jira for {0} using query [{1}]".format(
                 issue_text, search_query
@@ -100,7 +99,4 @@ class MyJiraWrapper(JiraWrapper):
         tasks = self.jira.search_issues(
             search_query
         )
-        task_count = len(tasks)
-        echo("Found {}: {}".format(task_count, tasks))
-
         return tasks
