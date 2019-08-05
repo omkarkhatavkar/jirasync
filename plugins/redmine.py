@@ -37,24 +37,8 @@ class RedminePlugin(object):
             prefix=self.redmine_task_prefix,
             issue=issue
         )
-
         # check if it already exists
-        search_query = (
-            'project = {} '
-            'AND status != Done '
-            'AND summary ~ \\"{}\\"'
-        ).format(
-            self.jira.project_id,
-            issue_text.replace('#', '\u0023')
-        )
-        echo(
-            "Searching Jira for {0} using query [{1}]".format(
-                issue_text, search_query
-            )
-        )
-        tasks = self.jira.jira.search_issues(
-            search_query
-        )
+        tasks = self.jira.search_existing_task(issue_text=issue_text)
         task_count = len(tasks)
         echo("Found {}: {}".format(task_count, tasks))
         if task_count > 1:
