@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from xdg import BaseDirectory
 
 from wrappers.jirawrapper import MyJiraWrapper
+
 from plugins.jira_workflow import (
     start_issue_workflow,
     start_create_pull_requests_workflow,
@@ -401,12 +402,15 @@ def redmine(config, sync):
 
 
 @cli.command()
-@click.option(
-    '--sync',
-    default=False,
-    is_flag=True,
-    help="Perform the writes to Jira"
-)
 @pass_config
-def sync(config, sync):
-    pass
+@click.pass_context
+def service_run(ctx, config):
+    """Run as a service/daemon based on `service` in `config.yaml`"""
+    config_data = get_yaml_data(config.config_file)['service']
+    sleep_time = config_data.get('sleep_time', 120)
+    while True:
+        for command in config_data['commands']:
+            ctx.invoke(globals()[command['name']], **command.get('kwargs', {}))
+        click.echo()
+        click.echo('Next run in {0} seconds...'.format(sleep_time))
+        time.sleep(sleep_time)
