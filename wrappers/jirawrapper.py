@@ -78,19 +78,20 @@ class MyJiraWrapper(JiraWrapper):
         if None not in (current_sprint_id, issue.key):
             self.jira.add_issues_to_sprint(current_sprint_id, issue.key)
 
-    def search_existing_task(self, issue_text, assignee=None):
+    def search_existing_task(self, issue_text, assignee=None, only_open=False):
         # check if it already exists
         search_query = (
-            'project = {} '
-            'AND status != Done '
-            'AND summary ~ \\"{}\\"'
+            'project = {} AND summary ~ \\"{}\\"'
         ).format(
-            self.project_id,
-            issue_text.replace('#', '\u0023')
+            self.project_id, issue_text.replace('#', '\u0023')
         )
 
         if assignee is not None:
             search_query += " AND assignee = {}".format(assignee)
+
+        if only_open:
+            search_query += " AND status != Done "
+
         echo(
             "Searching Jira for {0} using query [{1}]".format(
                 issue_text, search_query
