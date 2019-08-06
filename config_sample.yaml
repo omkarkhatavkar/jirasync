@@ -20,6 +20,15 @@ redmine_url: <redmine_url>
 redmine_task_prefix: <redmine task prefix>
 redmine_username: <redmine api username/email>
 redmine_password: <redmine password>
+service:
+  sleep_time: 120
+  commands:
+    - name: start_syncing_team
+      kwargs:
+        interval: week
+    - name: redmine
+      kwargs:
+        sync: true
 teams:
   SATQE:
       board: <Jira Board Name>

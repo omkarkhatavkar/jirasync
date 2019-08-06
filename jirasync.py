@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from xdg import BaseDirectory
 
 from wrappers.jirawrapper import MyJiraWrapper
+
 from plugins.jira_workflow import (
     start_issue_workflow,
     start_create_pull_requests_workflow,
@@ -398,3 +399,18 @@ def redmine(config, sync):
                 continue
             click.echo("For User ==> {0}:{1}".format(user, redmine_userid))
             redmine_plugin.process_issues(redmine_userid, jira_username)
+
+
+@cli.command()
+@pass_config
+@click.pass_context
+def service_run(ctx, config):
+    """Run as a service/daemon based on `service` in `config.yaml`"""
+    config_data = get_yaml_data(config.config_file)['service']
+    sleep_time = config_data.get('sleep_time', 120)
+    while True:
+        for command in config_data['commands']:
+            ctx.invoke(globals()[command['name']], **command.get('kwargs', {}))
+        click.echo()
+        click.echo('Next run in {0} seconds...'.format(sleep_time))
+        time.sleep(sleep_time)
