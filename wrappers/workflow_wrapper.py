@@ -74,8 +74,6 @@ def update_existing_issue_in_current_sprint(task, issue, jira, issue_text):
         else:
             # change the title id it was update in source (e.g. github)
             if issue.title.encode('utf-8') not in task.fields.summary.encode('utf-8'):
-                import pdb
-                pdb.set_trace()
                 new_summary = '{} -{}'.format(issue_text, issue.title.encode('utf-8'))
                 jira.change_title(task.id.encode(), new_summary)
                 echo_skip("Title Updated Jira .....{}/browse/{}".format(jira.jira_url, task.key.encode('utf-8')))
