@@ -21,7 +21,7 @@ redmine_task_prefix: <redmine task prefix>
 redmine_username: <redmine api username/email>
 redmine_password: <redmine password>
 service:
-  sleep_time: 30
+  sleep_time: 120
   commands:
     - name: start_syncing_team
       kwargs:

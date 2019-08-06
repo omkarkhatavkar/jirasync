@@ -5,11 +5,16 @@
 
 # create directories
 mkdir -p /var/lib/jirasync
-mkdir -p /var/run/jirasync
 mkdir -p /etc/jirasync 
 
 # copy config files
-cp config_sample.yaml /etc/jirasync/config.yaml
+file="/etc/jirasync/config.yaml"
+if [ ! -f "$file" ]
+then
+    cp config_sample.yaml /etc/jirasync/config.yaml
+    echo "Please Edit /etc/jirasync/config.yaml"
+fi
+
 cp jirasync.service /lib/systemd/system/jirasync.service
 
 # enable virtualenv
@@ -32,8 +37,6 @@ chmod +x /var/lib/jirasync/env/bin/jirasync
 
 # Selinux must be disabled
 sudo setenforce 0
-
-echo "Please Edit /etc/jirasync/config.yaml"
 
 # systemd
 systemctl daemon-reload
