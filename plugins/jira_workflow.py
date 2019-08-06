@@ -18,7 +18,12 @@ def start_issue_workflow(github_issues, jira, assignee=None):
                   " github {}".format(issue_text))
         elif len(tasks) == 1:  # Issue Already Exist, Check Assignee and Status
             echo_error("Updating Issue task for .....{}".format(issue.data['html_url']))
-            update_existing_issue_in_current_sprint(tasks[0], issue, jira=jira)
+            update_existing_issue_in_current_sprint(
+                tasks[0],
+                issue,
+                jira=jira,
+                issue_text=issue_text,
+            )
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error("Creating Issue task for.....{}".format(issue.data['html_url']))
             create_new_issue_in_backlog(
@@ -41,7 +46,12 @@ def start_create_pull_requests_workflow(github_issues, jira, assignee=None):
                   " github {}".format(pr_text))
         elif len(tasks) == 1:  # Issue Already Exist, Check Assignee and Status
             echo_error("Updating PR task for .....{}".format(issue.data['html_url']))
-            update_existing_issue_in_current_sprint(tasks[0], issue, jira=jira)
+            update_existing_issue_in_current_sprint(
+                tasks[0],
+                issue,
+                jira=jira,
+                issue_text=pr_text,
+            )
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error("Creating PR task for.....{}".format(issue.data['html_url']))
             create_pull_request_in_current_sprint(
@@ -64,7 +74,11 @@ def start_review_pull_requests_workflow(github_issues, jira, assignee=None):
                   " github {}".format(pr_review_text))
         elif len(tasks) == 1:  # Issue Already Exist, Check Assignee and Status
             echo_error("Updating PR review task for .....{}".format(issue.data['html_url']))
-            update_existing_issue_in_current_sprint(tasks[0], issue, jira=jira)
+            update_existing_issue_in_current_sprint(tasks[0],
+                                                    issue,
+                                                    jira=jira,
+                                                    issue_text=pr_review_text,
+                                                    )
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error("Creating PR review task for .....{}".format(issue.data['html_url']))
             create_pull_request_in_current_sprint(

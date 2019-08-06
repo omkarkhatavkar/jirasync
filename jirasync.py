@@ -108,7 +108,7 @@ def formatting(header, github_list):
         echo_error("No new item found !")
     else:
         for item in github_list:
-            echo_error(item.data['url'])
+            echo_error(item.data['html_url'])
     print("\n")
 
 
@@ -271,14 +271,15 @@ def show_team_history(config, interval):
                 teams[team]['git_urls'],
                 teams[team]['github_token']
             )
-            created_issue_list = git_hub_plugin.get_github_issues_created_list()
             assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
+            time.sleep(3)
             pr_list = git_hub_plugin.get_opened_pull_requests()
             pr_closed_list = git_hub_plugin.get_pull_requests_merged_closed()
+            time.sleep(3)
             pr_review_list_closed = git_hub_plugin.get_pull_requests_reviewed()
             pr_review_list_open = git_hub_plugin.get_pull_requests_review_in_progress()
-            formatting('Issues Created', created_issue_list)
-            formatting('Issues Assigned', assigned_issue_list)
+            time.sleep(3)
+            formatting('Github Issues Assigned', assigned_issue_list)
             formatting('PR Raised this week', pr_list)
             formatting('PR Raised and now Merged Status', pr_closed_list)
             formatting('PR Reviewed Closed Status', pr_review_list_closed)
@@ -314,7 +315,6 @@ def start_syncing_team(config, interval):
                 teams[team]['github_token']
             )
 
-            created_issue_list = git_hub_plugin.get_github_issues_created_list()
             assigned_issue_list = git_hub_plugin.get_github_issues_assigned_list()
             time.sleep(3)
             pr_list = git_hub_plugin.get_opened_pull_requests()
@@ -324,9 +324,7 @@ def start_syncing_team(config, interval):
             pr_review_list_open = git_hub_plugin.get_pull_requests_review_in_progress()
             time.sleep(3)
             jira = MyJiraWrapper(config.config_file, config.config_file)
-            start_issue_workflow(github_issues=created_issue_list,
-                                 jira=jira,
-                                 assignee=users[user]['jira_username'])
+
             start_issue_workflow(
                 github_issues=assigned_issue_list,
                 jira=jira,

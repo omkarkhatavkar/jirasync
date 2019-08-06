@@ -72,6 +72,11 @@ class MyJiraWrapper(JiraWrapper):
         f = IssueFields().assignee(new_assignee)
         issue.update(**f.kwarg)
 
+    def change_title(self, issue_name, new_summary):
+        issue = self.jira.issue(issue_name)
+        f = IssueFields().summary(new_summary)
+        issue.update(**f.kwarg)
+
     def update_sprint(self, issue_name):
         issue = self.jira.issue(issue_name)
         current_sprint_id = self.current_sprint_id
