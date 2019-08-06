@@ -64,9 +64,9 @@ class GitHubPlugin(object):
         stats = []
         for issue_stat in all_stats[:]:
             assignees = len(issue_stat.data['assignees'])
-            if assignees == 1 and status is None:
+            if assignees > 1 and status is None:
                 stats.append(issue_stat)
-            elif assignees == 1 and status == str(issue_stat.data['state'].encode()):
+            elif assignees > 1 and status == str(issue_stat.data['state'].encode()):
                 stats.append(issue_stat)
         issue_list = filter_issue_list(self.git_urls, stats)
         # print_issue_list(issue_list)

@@ -67,12 +67,17 @@ def create_pull_request_review_in_current_sprint(issue, jira, issue_text, assign
                                                                      created_issue.key.encode('utf-8')))
 
 
-def update_existing_issue_in_current_sprint(task, issue, jira):
+def update_existing_issue_in_current_sprint(task, issue, jira, issue_text):
     if isinstance(jira, MyJiraWrapper):
         if task.fields.status.name.encode('utf-8') == 'Done':
             echo_skip("No Need of Update! Already Done!")
         else:
-            if issue.data['state'].encode('utf-8') == 'closed':
+            # change the title id it was update in source (e.g. github)
+            if issue.title.encode('utf-8') not in task.fields.summary.encode('utf-8'):
+                new_summary = '{} -{}'.format(issue_text, issue.title.encode('utf-8'))
+                jira.change_title(task.id.encode(), new_summary)
+                echo_skip("Title Updated Jira .....{}/browse/{}".format(jira.jira_url, task.key.encode('utf-8')))
+            elif issue.data['state'].encode('utf-8') == 'closed':
                 # jira.update_sprint(task.key.encode('utf-8')) this is failing need to find some better solution
                 jira.change_status(task.id.encode('utf-8'), 'Done')
                 echo_skip("Status Updated Jira .....{}/browse/{}".format(jira.jira_url, task.key.encode('utf-8')))
