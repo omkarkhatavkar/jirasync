@@ -1,8 +1,11 @@
+# coding: utf-8
 """Redmine Integration Plugin"""
 
 from copy import copy
+
 from redminelib import Redmine
-from utils.utils import echo, echo_error, echo_success, echo_skip
+
+from jirasync.utils import echo, echo_error, echo_skip, echo_success
 
 
 class RedminePlugin(object):
@@ -15,7 +18,7 @@ class RedminePlugin(object):
         redmine_password,
         redmine_task_prefix="redmine",
         sync=False,
-        jira=None
+        jira=None,
     ):
         """Creates a new instance for RedminePlugin
 
@@ -31,9 +34,7 @@ class RedminePlugin(object):
             jira {JiraWrapper} -- Instance of a JiraWrapper (default: {None})
         """
         self.redmine = Redmine(
-            redmine_url,
-            username=redmine_username,
-            password=redmine_password
+            redmine_url, username=redmine_username, password=redmine_password
         )
         self.redmine_task_prefix = redmine_task_prefix
         self.sync = sync
@@ -59,9 +60,8 @@ class RedminePlugin(object):
         Returns:
             str -- The summary built of issue data and prefix
         """
-        return '{prefix}#{issue.project}#{issue.id}#'.format(
-            prefix=self.redmine_task_prefix,
-            issue=issue
+        return "{prefix}#{issue.project}#{issue.id}#".format(
+            prefix=self.redmine_task_prefix, issue=issue
         )
 
     def get_issues(self, redmine_userid):
@@ -76,7 +76,7 @@ class RedminePlugin(object):
         user = self.redmine.user.get(redmine_userid)
         return list(
             # use (status_id='open|closed') to filter out issues
-            self.redmine.issue.filter(assigned_to_id=user.id, status_id='*')
+            self.redmine.issue.filter(assigned_to_id=user.id, status_id="*")
         )
 
     def do_sync(self, issue, jira_username):
@@ -115,17 +115,17 @@ class RedminePlugin(object):
         """
 
         # Check if task is already done or reopened
-        if task.fields.status.name.encode() == 'Done':
-            if 'close' not in issue.status.name.lower() and self.sync:
+        if task.fields.status.name.encode() == "Done":
+            if "close" not in issue.status.name.lower() and self.sync:
                 # Task has been reopened on redmine, start transition workflow
-                self.jira.change_status(task.id.encode(), 'Reopen')
+                self.jira.change_status(task.id.encode(), "Reopen")
                 echo_success(
                     "Reopened {0}/{1}[{issue.status}] "
                     "on {2}".format(
                         task,
                         task.fields.summary,
                         task.permalink(),
-                        issue=issue
+                        issue=issue,
                     )
                 )
             else:
@@ -135,13 +135,13 @@ class RedminePlugin(object):
         # Check if there are other changes on Redmine to be updated on Jira
         current_assignee = copy(task.fields.assignee.key)
         current_summary = task.fields.summary.replace(
-            "{} - ".format(self.make_issue_text(issue)), ''
+            "{} - ".format(self.make_issue_text(issue)), ""
         )
         changed_fields = {}
         if current_assignee != jira_username:
-            changed_fields['assignee'] = jira_username
+            changed_fields["assignee"] = jira_username
         if current_summary != issue.subject:
-            changed_fields['summary'] = self.make_summary(issue)
+            changed_fields["summary"] = self.make_summary(issue)
 
         if changed_fields:
             echo_success(
@@ -151,20 +151,17 @@ class RedminePlugin(object):
 
         # status cannot be changed by calling task.update
         # must call the `transition` workflow.
-        if 'close' in issue.status.name.lower() and self.sync:
-            self.jira.change_status(task.id.encode(), 'Done')
+        if "close" in issue.status.name.lower() and self.sync:
+            self.jira.change_status(task.id.encode(), "Done")
             echo_success(
                 "Closed {0}/{1}[{issue.status}] "
                 "on {2}".format(
-                    task,
-                    task.fields.summary,
-                    task.permalink(),
-                    issue=issue
+                    task, task.fields.summary, task.permalink(), issue=issue
                 )
             )
         else:
             echo_skip(
-                'Skipping: {0}/{1}[{issue.status}] {msg} '
+                "Skipping: {0}/{1}[{issue.status}] {msg} "
                 "on {2}".format(
                     task,
                     task.fields.summary,
@@ -174,7 +171,7 @@ class RedminePlugin(object):
                         "`--sync` is disabled"
                         if not self.sync
                         else "no status update"
-                    )
+                    ),
                 )
             )
 
@@ -192,38 +189,36 @@ class RedminePlugin(object):
             u'project', u'relations', u'status', u'subject', u'time_entries',
             u'tracker', u'updated_on', u'watchers']
         """
-        if 'close' in issue.status.name.lower():
+        if "close" in issue.status.name.lower():
             echo_skip(
-                'Issue {0} is closed on redmine, skipping'.format(issue.id)
+                "Issue {0} is closed on redmine, skipping".format(issue.id)
             )
             return
 
         params = {
-            'summary': self.make_summary(issue),
-            'details': "Source: {}\n{}".format(
+            "summary": self.make_summary(issue),
+            "details": "Source: {}\n{}".format(
                 "{}/issues/{}".format(self.redmine.url, issue.id),
-                issue.description
+                issue.description,
             ),
-            'component': 'Automation',
-            'labels': ['Automation', self.redmine_task_prefix],
-            'sprint': 'backlog',
-            'assignee': jira_username,  # FIXME
-            'issuetype': 'Task',
+            "component": "Automation",
+            "labels": ["Automation", self.redmine_task_prefix],
+            "sprint": "backlog",
+            "assignee": jira_username,  # FIXME
+            "issuetype": "Task",
         }
 
         if self.sync:
             created_task = self.jira.create_issue(**params)
             echo_success(
                 "Created Jira {} on {}".format(
-                    created_task.fields.summary,
-                    created_task.permalink()
+                    created_task.fields.summary, created_task.permalink()
                 )
             )
         else:
             echo_skip(
                 "{} to be created on Jira with {} ".format(
-                    self.make_issue_text(issue),
-                    params
+                    self.make_issue_text(issue), params
                 )
             )
 
@@ -240,7 +235,7 @@ class RedminePlugin(object):
             jira_username = self.jira.userid.encode()
         for issue in issues:
             echo(
-                "\n## Processing: {issue}:{issue.id} - status: {issue.status}"
-                .format(issue=issue)
+                "\n## Processing: {issue}:{issue.id} -"
+                " status: {issue.status}".format(issue=issue)
             )
             self.do_sync(issue, jira_username)

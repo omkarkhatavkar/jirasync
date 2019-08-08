@@ -38,7 +38,7 @@ Jirasync is a CLI tool which collects all GitHub Issues, PR, PR_Reviews and trac
 
 #### Main Features 
 
--   See the list of work was done on GitHub based on week and day interval.    
+-   See the list of work was done on GitHub and Redmine based on week and day interval.    
 -   Sync and track your own github work in Jira running one command 
 -   You can sync not only single user but also multiteam menmbers by configurating team.yaml
 -  All pr_create, pr_reviews, issue_create has been added to sync with JIRA.
