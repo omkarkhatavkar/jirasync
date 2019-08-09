@@ -2,7 +2,7 @@
 
 virtualenv env
 source env/bin/activate
-pip install --editable .
+python setup.py develop
 pip install -r requirements.txt
 pip install -r requirements-another.txt
 eval "$(_JIRASYNC_COMPLETE=source jirasync)"

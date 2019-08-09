@@ -1,15 +1,20 @@
-from jiraprompt.wrapper import (
-    JiraWrapper,
-    IssueFields,
-)
-from utils.utils import echo
+# coding: utf-8
+from jiraprompt.wrapper import IssueFields, JiraWrapper
+
+from jirasync.utils import echo
 
 
 class MyJiraWrapper(JiraWrapper):
-
-    def create_issue(self, summary, details=None, component=None,
-                     labels=None, assignee=None, sprint=None,
-                     issuetype='Task'):
+    def create_issue(
+        self,
+        summary,
+        details=None,
+        component=None,
+        labels=None,
+        assignee=None,
+        sprint=None,
+        issuetype="Task",
+    ):
         """
         Create an issue (by default, a Story) in the agile sprint.
 
@@ -33,17 +38,14 @@ class MyJiraWrapper(JiraWrapper):
 
         if not sprint:
             sprint_id = self.current_sprint_id
-        elif sprint != 'backlog':
+        elif sprint != "backlog":
             _, sprint_id = self.find_sprint(sprint)
 
         f = IssueFields()
         comp_name_server_side, _ = self.find_component(component)
-        f.summary(summary) \
-            .description(details) \
-            .component(comp_name_server_side) \
-            .labels(labels) \
-            .project(id=self.project_id) \
-            .issuetype(issuetype)
+        f.summary(summary).description(details).component(
+            comp_name_server_side
+        ).labels(labels).project(id=self.project_id).issuetype(issuetype)
 
         new_issue = self.jira.create_issue(**f.kwarg)
 
@@ -64,7 +66,9 @@ class MyJiraWrapper(JiraWrapper):
     def change_status(self, issue_name, new_status_name):
         issue = self.jira.issue(issue_name)
         avail_statuses = self.get_avail_statuses(issue)
-        new_status_id = self.get_avail_status_id(avail_statuses, new_status_name)
+        new_status_id = self.get_avail_status_id(
+            avail_statuses, new_status_name
+        )
         self.jira.transition_issue(issue, new_status_id)
 
     def change_assignee(self, issue_name, new_assignee):
@@ -85,10 +89,8 @@ class MyJiraWrapper(JiraWrapper):
 
     def search_existing_task(self, issue_text, assignee=None, only_open=False):
         # check if it already exists
-        search_query = (
-            'project = {} AND summary ~ \\"{}\\"'
-        ).format(
-            self.project_id, issue_text.replace('#', '\u0023')
+        search_query = ('project = {} AND summary ~ \\"{}\\"').format(
+            self.project_id, issue_text.replace("#", "\u0023")
         )
 
         if assignee is not None:
@@ -102,7 +104,5 @@ class MyJiraWrapper(JiraWrapper):
                 issue_text, search_query
             )
         )
-        tasks = self.jira.search_issues(
-            search_query
-        )
+        tasks = self.jira.search_issues(search_query)
         return tasks

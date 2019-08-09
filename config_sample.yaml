@@ -1,3 +1,4 @@
+# Copy this file to /etc/jirasync/config.yaml or ~/.config/jirasync/config.yaml
 auth:
   basic_auth: false
   kerberos: true
