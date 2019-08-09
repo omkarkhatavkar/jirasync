@@ -1,4 +1,4 @@
-.PHONY: clean format lint all install
+.PHONY: clean format lint all install deploy-service
 
 clean:
 	@find ./ -name '*.pyc' -exec rm -f {} \;
@@ -21,5 +21,8 @@ lint:
 all: format lint
 
 install:
-	pip install -e .
+	python setup.py develop
 	pip install -r requirements.txt -r requirements-another.txt -r requirements-dev.txt
+
+deploy-service:
+	./scripts/deploy.sh

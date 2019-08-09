@@ -3,6 +3,10 @@
 # This script is to be ansibilized
 # run as root or with sudo
 
+# call it from main directory
+# ./scripts/deploy.sh
+# or use `make deploy-service`
+
 # create directories
 mkdir -p /var/lib/jirasync
 mkdir -p /etc/jirasync 
@@ -23,7 +27,7 @@ virtualenv -p python2.7 /var/lib/jirasync/env
 source /var/lib/jirasync/env/bin/activate
 
 # install everything
-/var/lib/jirasync/env/bin/pip install --editable .
+/var/lib/jirasync/env/bin/python setup.py install
 /var/lib/jirasync/env/bin/pip install -r requirements.txt
 /var/lib/jirasync/env/bin/pip install -r requirements-another.txt 
 
