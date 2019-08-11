@@ -24,7 +24,7 @@ def start_issue_workflow(github_issues, jira, assignee=None):
                 )
             )
             update_existing_issue_in_current_sprint(
-                tasks[0], issue, jira=jira, issue_text=issue_text
+                tasks[0], issue, jira=jira, issue_text=issue_text,
             )
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error(
@@ -52,7 +52,7 @@ def start_create_pull_requests_workflow(github_issues, jira, assignee=None):
                 "Updating PR task for .....{}".format(issue.data["html_url"])
             )
             update_existing_issue_in_current_sprint(
-                tasks[0], issue, jira=jira, issue_text=pr_text
+                tasks[0], issue, jira=jira, issue_text=pr_text, assignee=assignee
             )
         elif len(tasks) == 0:  # Create new issue in backlog.
             echo_error(

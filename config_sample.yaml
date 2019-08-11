@@ -24,9 +24,10 @@ redmine_password: <redmine password>
 service:
   sleep_time: 120
   commands:
-    - name: start_syncing_team
+    - name: github
       kwargs:
         interval: week
+        sync: true
     - name: redmine
       kwargs:
         sync: true
