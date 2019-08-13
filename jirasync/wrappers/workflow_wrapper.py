@@ -89,9 +89,15 @@ def create_pull_request_review_in_current_sprint(
             )
 
 
-def update_existing_issue_in_current_sprint(task, issue, jira, issue_text):
+def update_existing_issue_in_current_sprint(task, issue, jira, issue_text,
+                                            assignee=None):
     if isinstance(jira, MyJiraWrapper):
-        if task.fields.status.name.encode("utf-8") == "Done":
+        # check correct assignment
+        if 'pr_create' in task.fields.summary:
+            if task.fields.assignee is None:
+                jira.change_assignee(task.id.encode(), assignee)
+
+        elif task.fields.status.name.encode("utf-8") == "Done":
             echo_skip("No Need of Update! Already Done!")
         else:
             # change the title id it was update in source (e.g. github)
