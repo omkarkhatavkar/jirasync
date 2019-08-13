@@ -221,16 +221,16 @@ def redmine(config, sync):
 )
 def run(ctx, commands, sync):
     """Run multiple commands within single command
-    e.g. jirasync run --command github, redmine """
+    e.g. jirasync run --commands github, redmine """
     current_commands = ('github', 'redmine')
     if commands is None:
         echo_error(
-            "Please pass --command option e.g. --command github, redmine"
+            "Please pass --commands option e.g. --commands github, redmine"
         )
         exit()
     for command in commands.strip().split(','):
         if command in current_commands:
-            ctx.invoke(globals()[command], sync=sync)
+            ctx.invoke(globals()[command.strip()], sync=sync)
         else:
             echo_error("{} command is not supported, \nCurrently supported "
                        "commands are {}". format(command,
